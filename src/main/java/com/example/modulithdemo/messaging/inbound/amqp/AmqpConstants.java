@@ -12,10 +12,13 @@ public final class AmqpConstants {
 
   // Inbound exchange used by external systems to publish new orders (optional bind)
   public static final String BOOKSTORE_EXCHANGE = "BookStoreExchange";
+  public static final String BOOKSTORE_DLX = "BookStoreExchange.DLX";
 
   // Inbound queue our application listens to
   public static final String NEW_ORDERS_QUEUE = "new-orders";
+  public static final String NEW_ORDERS_DLQ = "new-orders.dlq";
 
   // Routing Keys for inbound messages
   public static final String ORDERS_NEW_ROUTING = "orders.new";
+  public static final String ORDERS_NEW_DLQ_ROUTING = "orders.new.dlq";
 }

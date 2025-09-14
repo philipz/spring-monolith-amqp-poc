@@ -22,7 +22,7 @@ class InboundNewOrderListenerTests {
   void onMessage_publishesOrderCreatedEvent_onValidJson() throws Exception {
     CapturingPublisher publisher = new CapturingPublisher();
     ObjectMapper objectMapper = new ObjectMapper();
-    InboundNewOrderListener listener = new InboundNewOrderListener(publisher, objectMapper);
+    InboundNewOrderListener listener = new InboundNewOrderListener(publisher, objectMapper, 3);
 
     String json = "{" +
         "\"orderNumber\":\"A123\"," +
@@ -31,7 +31,7 @@ class InboundNewOrderListenerTests {
         "\"customer\":{\"name\":\"Alice\",\"email\":\"alice@example.com\",\"phone\":\"123\"}" +
         "}";
 
-    assertDoesNotThrow(() -> listener.onMessage(json));
+    assertDoesNotThrow(() -> listener.handle(json));
 
     assertEquals(1, publisher.events.size(), "should publish exactly one event");
     Object published = publisher.events.get(0);
@@ -49,14 +49,14 @@ class InboundNewOrderListenerTests {
   }
 
   @Test
-  void onMessage_doesNotThrow_orPublish_onMalformedJson() {
+  void onMessage_throws_andDoesNotPublish_onMalformedJson() {
     CapturingPublisher publisher = new CapturingPublisher();
     ObjectMapper objectMapper = new ObjectMapper();
-    InboundNewOrderListener listener = new InboundNewOrderListener(publisher, objectMapper);
+    InboundNewOrderListener listener = new InboundNewOrderListener(publisher, objectMapper, 3);
 
     String bad = "not-json";
 
-    assertDoesNotThrow(() -> listener.onMessage(bad));
+    assertThrows(Exception.class, () -> listener.handle(bad));
     assertTrue(publisher.events.isEmpty(), "should not publish any events");
   }
 }
