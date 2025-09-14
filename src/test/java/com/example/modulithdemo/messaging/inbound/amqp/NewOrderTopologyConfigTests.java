@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.util.Map;
 
@@ -15,6 +16,7 @@ class NewOrderTopologyConfigTests {
   @Test
   void newOrderQueue_hasDlqArguments_andDlqBeansPresent() {
     try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext()) {
+      TestPropertySourceUtils.addInlinedPropertiesToEnvironment(ctx, "app.amqp.new-orders.bind=true");
       ctx.register(NewOrderTopologyConfig.class);
       ctx.refresh();
 
@@ -32,4 +34,3 @@ class NewOrderTopologyConfigTests {
     }
   }
 }
-

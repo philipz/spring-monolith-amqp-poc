@@ -16,9 +16,6 @@ spring:
   datasource:
     url: jdbc:h2:mem:modulith;MODE=LEGACY;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
 
   modulith:
     events:
@@ -27,7 +24,10 @@ spring:
       jdbc:
         schema-initialization:
           enabled: true
-      republish-outstanding-events-on-restart: true
+      # H2 in-memory: disable restart republish (state is ephemeral)
+      republish-outstanding-events-on-restart: false
+      # Remove completed publications immediately in dev/H2 to avoid growth during long runs
+      completion-mode: DELETE
 
 logging:
   level:

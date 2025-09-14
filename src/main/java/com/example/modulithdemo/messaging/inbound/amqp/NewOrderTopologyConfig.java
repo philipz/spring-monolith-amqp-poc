@@ -15,6 +15,7 @@ import static com.example.modulithdemo.messaging.inbound.amqp.AmqpConstants.*;
 public class NewOrderTopologyConfig {
 
   @Bean
+  @ConditionalOnProperty(name = "app.amqp.new-orders.bind", havingValue = "true")
   Queue newOrderQueue() {
     return QueueBuilder.durable(NEW_ORDERS_QUEUE)
         .withArgument("x-dead-letter-exchange", BOOKSTORE_DLX)
@@ -34,18 +35,21 @@ public class NewOrderTopologyConfig {
     return BindingBuilder.bind(newOrderQueue).to(newOrderExchange).with(ORDERS_NEW_ROUTING);
   }
 
-  // Dead-letter exchange and queue are unconditional; they don't create connections until used
+  // Dead-letter exchange and queue are created only when we manage topology
   @Bean
+  @ConditionalOnProperty(name = "app.amqp.new-orders.bind", havingValue = "true")
   DirectExchange newOrderDlx() {
     return new DirectExchange(BOOKSTORE_DLX, true, false);
   }
 
   @Bean
+  @ConditionalOnProperty(name = "app.amqp.new-orders.bind", havingValue = "true")
   Queue newOrderDlq() {
     return QueueBuilder.durable(NEW_ORDERS_DLQ).build();
   }
 
   @Bean
+  @ConditionalOnProperty(name = "app.amqp.new-orders.bind", havingValue = "true")
   Binding bindNewOrderDlq(Queue newOrderDlq, DirectExchange newOrderDlx) {
     return BindingBuilder.bind(newOrderDlq).to(newOrderDlx).with(ORDERS_NEW_DLQ_ROUTING);
   }
