@@ -1,4 +1,4 @@
-package com.example.modulithdemo.inbound.amqp;
+package com.example.modulithdemo.messaging.inbound.amqp;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

@@ -1,4 +1,4 @@
-package com.example.modulithdemo.inbound.amqp;
+package com.example.modulithdemo.messaging.inbound.amqp;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -8,30 +8,26 @@ import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+
+import static com.example.modulithdemo.messaging.inbound.amqp.AmqpConstants.*;
 
 @Configuration
-@Profile("amqp")
 public class NewOrderTopologyConfig {
-
-  public static final String QUEUE = "new-orders";
-  public static final String EXCHANGE = "BookStoreExchange";
-  public static final String ROUTING = "orders.new";
 
   @Bean
   Queue newOrderQueue() {
-    return QueueBuilder.durable(QUEUE).build();
+    return QueueBuilder.durable(NEW_ORDERS_QUEUE).build();
   }
 
   @Bean
   @ConditionalOnProperty(name = "app.amqp.new-orders.bind", havingValue = "true")
   DirectExchange newOrderExchange() {
-    return new DirectExchange(EXCHANGE, true, false);
+    return new DirectExchange(BOOKSTORE_EXCHANGE, true, false);
   }
 
   @Bean
   @ConditionalOnProperty(name = "app.amqp.new-orders.bind", havingValue = "true")
   Binding bindNewOrderQueue(Queue newOrderQueue, DirectExchange newOrderExchange) {
-    return BindingBuilder.bind(newOrderQueue).to(newOrderExchange).with(ROUTING);
+    return BindingBuilder.bind(newOrderQueue).to(newOrderExchange).with(ORDERS_NEW_ROUTING);
   }
 }

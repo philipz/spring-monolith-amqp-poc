@@ -1,4 +1,4 @@
-package com.example.modulithdemo.domain.order;
+package com.example.modulithdemo.order.domain;
 
 public class OrderCompletionException extends RuntimeException {
 

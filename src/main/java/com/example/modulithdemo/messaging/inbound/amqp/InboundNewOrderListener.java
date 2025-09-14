@@ -1,14 +1,14 @@
-package com.example.modulithdemo.inbound.amqp;
+package com.example.modulithdemo.messaging.inbound.amqp;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import org.springframework.context.annotation.Profile;
 
-import com.example.modulithdemo.domain.order.Customer;
-import com.example.modulithdemo.domain.order.OrderCreatedEvent;
+import com.example.modulithdemo.order.domain.Customer;
+import com.example.modulithdemo.order.domain.OrderCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -16,19 +16,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * Logs payload and publishes internal OrderCreatedEvent for downstream modules.
  */
 @Component
-@Profile("amqp")
+@RequiredArgsConstructor
 public class InboundNewOrderListener {
+
   private static final Logger log = LoggerFactory.getLogger(InboundNewOrderListener.class);
 
   private final ApplicationEventPublisher events;
   private final ObjectMapper objectMapper;
 
-  public InboundNewOrderListener(ApplicationEventPublisher events, ObjectMapper objectMapper) {
-    this.events = events;
-    this.objectMapper = objectMapper;
-  }
-
-  @RabbitListener(queues = "new-orders")
+  @RabbitListener(queues = AmqpConstants.NEW_ORDERS_QUEUE)
   public void onMessage(String payload) {
     log.info("[InboundNewOrderListener] received payload from 'new-orders': {}", payload);
     try {

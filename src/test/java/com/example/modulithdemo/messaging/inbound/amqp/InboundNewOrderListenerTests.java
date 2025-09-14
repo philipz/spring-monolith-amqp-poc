@@ -1,20 +1,26 @@
-package com.example.modulithdemo.inbound.amqp;
+package com.example.modulithdemo.messaging.inbound.amqp;
 
-import com.example.modulithdemo.domain.order.Customer;
-import com.example.modulithdemo.domain.order.OrderCreatedEvent;
+import com.example.modulithdemo.order.domain.Customer;
+import com.example.modulithdemo.order.domain.OrderCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class InboundNewOrderListenerTests {
 
+  static class CapturingPublisher implements ApplicationEventPublisher {
+    final List<Object> events = new ArrayList<>();
+    @Override public void publishEvent(Object event) { events.add(event); }
+  }
+
   @Test
   void onMessage_publishesOrderCreatedEvent_onValidJson() throws Exception {
-    ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+    CapturingPublisher publisher = new CapturingPublisher();
     ObjectMapper objectMapper = new ObjectMapper();
     InboundNewOrderListener listener = new InboundNewOrderListener(publisher, objectMapper);
 
@@ -27,9 +33,8 @@ class InboundNewOrderListenerTests {
 
     assertDoesNotThrow(() -> listener.onMessage(json));
 
-    ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
-    verify(publisher, times(1)).publishEvent(captor.capture());
-    Object published = captor.getValue();
+    assertEquals(1, publisher.events.size(), "should publish exactly one event");
+    Object published = publisher.events.get(0);
     assertTrue(published instanceof OrderCreatedEvent);
 
     OrderCreatedEvent event = (OrderCreatedEvent) published;
@@ -45,14 +50,13 @@ class InboundNewOrderListenerTests {
 
   @Test
   void onMessage_doesNotThrow_orPublish_onMalformedJson() {
-    ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+    CapturingPublisher publisher = new CapturingPublisher();
     ObjectMapper objectMapper = new ObjectMapper();
     InboundNewOrderListener listener = new InboundNewOrderListener(publisher, objectMapper);
 
     String bad = "not-json";
 
     assertDoesNotThrow(() -> listener.onMessage(bad));
-    verify(publisher, never()).publishEvent(any());
+    assertTrue(publisher.events.isEmpty(), "should not publish any events");
   }
 }
-
