@@ -4,7 +4,7 @@
 以「領域事件」作為跨模組整合方式，並示範：
 - 內部事件：`OrderCompleted` 由 `OrderManagement` 發佈，`InventoryManagement` 以 `@ApplicationModuleListener` 非同步處理。
 - 事件外部化（AMQP）：`OrderCompleted` 透過 Modulith 外部化到 RabbitMQ（Exchange `domain.events`、Routing Key `order.completed`）。
-- AMQP 入站：啟用 `amqp` Profile 後，從 Queue `new-orders` 接收「新訂單」JSON，轉為內部 `OrderCreatedEvent`，再由 Listener 處理。
+- AMQP 入站：從 Queue `new-orders` 接收「新訂單」JSON，轉為內部 `OrderCreatedEvent`，再由 Listener 處理（預設啟用）。
 
 > 深入說明可參考：`Application_Events_and_AMQP_Integration.md`、`Event-design.md`。
 
@@ -40,8 +40,8 @@
 - `inbound/amqp`：AMQP 介面（拓樸 + Listener）
   - `RabbitTopologyConfig`：`domain.events` Exchange、Queue `new-orders`、Routing `order.completed`
   - `InboundAmqpAdapter`：示範從 Queue 讀取 UUID 並發佈 `OrderCompleted` 事件
-  - `NewOrderTopologyConfig`（僅 `amqp` Profile 啟用）：Queue `new-orders` 與 `BookStoreExchange` 綁定（由 `app.amqp.new-orders.bind` 控制）
-  - `InboundNewOrderListener`（僅 `amqp` Profile 啟用）：從 `new-orders` 讀 JSON，轉為 `OrderCreatedEvent`
+  - `NewOrderTopologyConfig`：Queue `new-orders` 與 `BookStoreExchange` 綁定（由 `app.amqp.new-orders.bind` 控制）
+  - `InboundNewOrderListener`：從 `new-orders` 讀 JSON，轉為 `OrderCreatedEvent`
 
 ## 架構圖
 
@@ -59,7 +59,7 @@ flowchart LR
     IM[InventoryManagement]
   end
 
-  subgraph "Inbound AMQP (profile=amqp)"
+  subgraph "Inbound AMQP (enabled by default)"
     IAA[InboundAmqpAdapter]
     INL[InboundNewOrderListener]
   end
@@ -86,7 +86,7 @@ flowchart LR
 flowchart TB
   %% Completed Flow
   subgraph Completed[Completed Order Flow]
-    A1[POST /orders/{id}/complete] --> A2[OrderManagement]
+    A1[POST /orders/$id/complete] --> A2[OrderManagement]
     A2 -->|OrderCompleted| A3[InventoryManagement]
     A2 -->|Externalized: domain.events::order.completed| A4[(RabbitMQ: domain.events)]
   end
@@ -111,7 +111,6 @@ flowchart TB
 可用環境變數或 CLI 覆寫：
 - RabbitMQ：`SPRING_RABBITMQ_HOST`、`SPRING_RABBITMQ_PORT`、`SPRING_RABBITMQ_USERNAME`、`SPRING_RABBITMQ_PASSWORD`
 - 關閉事件外部化：`--spring.modulith.events.externalization.enabled=false`
-- 啟用 AMQP 入站模組：`--spring.profiles.active=amqp`
 - 綁定 `new-orders` 與 `BookStoreExchange`：`--app.amqp.new-orders.bind=true`
 
 > 預設 `app.amqp.new-orders.bind=false`，避免與 `OrderCreatedEvent` 的外部化造成回送迴圈。
@@ -126,9 +125,9 @@ flowchart TB
     - 日誌包含 `[Inventory] received OrderCompleted: ...`
     - 若已連上 RabbitMQ，訊息亦會外部化到 Exchange `domain.events`，Routing Key `order.completed`
 
-- 由 RabbitMQ 注入新訂單（啟用 `amqp` Profile）：
+- 由 RabbitMQ 注入新訂單：
   1) 啟動：
-     - `./mvnw spring-boot:run -Dspring-boot.run.profiles=amqp`
+     - `./mvnw spring-boot:run`
   2) 發佈 JSON 至 Queue `new-orders`（可用任何 Rabbit 工具；範例 payload）：
      ```json
      {

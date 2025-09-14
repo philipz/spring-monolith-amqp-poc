@@ -20,7 +20,7 @@ spring:
   modulith:
     events:
       externalization:
-        enabled: true
+        enabled: false
       jdbc:
         schema-initialization:
           enabled: true

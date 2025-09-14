@@ -1,8 +1,8 @@
-package com.example.modulithdemo.feature.inventory;
+package com.example.modulithdemo.inventory;
 
 import com.example.modulithdemo.DemoApplication;
-import com.example.modulithdemo.domain.order.Customer;
-import com.example.modulithdemo.domain.order.OrderCreatedEvent;
+import com.example.modulithdemo.order.domain.Customer;
+import com.example.modulithdemo.order.domain.OrderCreatedEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import com.example.modulithdemo.domain.order.OrderCreatedEventListener;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = DemoApplication.class)
 @Import(OrderCreatedFlowTests.TestListener.class)
-@MockBean(OrderCreatedEventListener.class)
 class OrderCreatedFlowTests {
 
   @Autowired ApplicationEventPublisher events;
