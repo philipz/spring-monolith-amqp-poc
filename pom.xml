@@ -36,6 +36,11 @@
 			<artifactId>spring-modulith-starter-core</artifactId>
 		</dependency>
 
+		<!-- Web & 基礎 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 		<!-- Modulith：事件 API / AMQP 外部化 / JSON序列化 / JDBC 事件登錄表 -->
 		<dependency>
 			<groupId>org.springframework.modulith</groupId>
