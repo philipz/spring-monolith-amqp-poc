@@ -24,8 +24,16 @@ spring:
       jdbc:
         schema-initialization:
           enabled: true
+      republish-outstanding-events-on-restart: true
 
 logging:
   level:
     org.springframework.modulith: INFO
     org.springframework.amqp: INFO
+
+app:
+  amqp:
+    new-orders:
+      # Control whether to bind queue 'new-orders' to exchange 'BookStoreExchange' with routing key 'orders.new'.
+      # Default false to avoid unintended feedback loops with @Externalized(OrderCreatedEvent).
+      bind: false

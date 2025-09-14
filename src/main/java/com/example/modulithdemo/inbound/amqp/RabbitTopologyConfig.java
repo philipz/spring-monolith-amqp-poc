@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitTopologyConfig {
   public static final String EXCHANGE = "domain.events";
-  public static final String QUEUE = "inventory.order.completed.q";
+  public static final String QUEUE = "new-orders";
   public static final String ROUTING = "order.completed";
 
   @Bean
