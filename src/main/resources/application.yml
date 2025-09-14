@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: demo
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  datasource:
+    url: jdbc:h2:mem:modulith;MODE=LEGACY;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  modulith:
+    events:
+      externalization:
+        enabled: true
+      jdbc:
+        schema-initialization:
+          enabled: true
+
+logging:
+  level:
+    org.springframework.modulith: INFO
+    org.springframework.amqp: INFO
