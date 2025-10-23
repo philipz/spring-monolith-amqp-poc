@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8082
 
 spring:
   application:
@@ -34,12 +34,22 @@ logging:
     org.springframework.modulith: INFO
     org.springframework.amqp: INFO
 
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
 app:
   amqp:
     new-orders:
       # Control whether to bind queue 'new-orders' to exchange 'BookStoreExchange' with routing key 'orders.new'.
       # Default false to avoid unintended feedback loops with @Externalized(OrderCreatedEvent).
-      bind: false
+      bind: true
       # Max processing attempts before rejecting to DLQ. Can be overridden via
       # env var SPRING_APPLICATION_JSON or CLI: --app.amqp.new-orders.retry-max-attempts=5
       retry-max-attempts: 3
