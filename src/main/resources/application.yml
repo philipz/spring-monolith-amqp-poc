@@ -5,17 +5,19 @@ spring:
   application:
     name: demo
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
     cache:
       channel:
         size: 50   # increase channel cache for higher throughput
 
   datasource:
-    url: jdbc:h2:mem:modulith;MODE=LEGACY;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
 
   modulith:
     events:
@@ -25,9 +27,9 @@ spring:
         schema-initialization:
           enabled: true
       # H2 in-memory: disable restart republish (state is ephemeral)
-      republish-outstanding-events-on-restart: false
+      republish-outstanding-events-on-restart: true
       # Remove completed publications immediately in dev/H2 to avoid growth during long runs
-      completion-mode: DELETE
+      completion-mode: UPDATE
 
 logging:
   level:
