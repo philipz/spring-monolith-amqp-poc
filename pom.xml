@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>modulithdemo</artifactId>
+	<artifactId>amqp-modulith</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>modulithdemo</name>
+	<name>amqp-modulith</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-modulith.version>1.4.3</spring-modulith.version>
+		<dockerImageName>philipz/${project.artifactId}:${project.version}</dockerImageName>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -77,11 +78,17 @@
 			<artifactId>spring-rabbit</artifactId>
 		</dependency>
 		
-		<!-- H2：簡化Jdbc事件登錄表 -->
+		<!-- PostgreSQL：用於生產環境的 JDBC 事件登錄表 -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- H2：用於測試環境 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
+			<scope>test</scope>
 		</dependency>
 		<!-- JDBC auto-configuration for DataSource (HikariCP) -->
 		<dependency>
@@ -150,6 +157,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+                    <image>
+                        <name>${dockerImageName}</name>
+                    </image>
+                </configuration>
 			</plugin>
 		</plugins>
 	</build>

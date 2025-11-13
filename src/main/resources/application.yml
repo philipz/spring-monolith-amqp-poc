@@ -5,29 +5,40 @@ spring:
   application:
     name: demo
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
     cache:
       channel:
         size: 50   # increase channel cache for higher throughput
 
   datasource:
-    url: jdbc:h2:mem:modulith;MODE=LEGACY;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:2}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:600000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
 
   modulith:
     events:
       externalization:
-        enabled: false
+        enabled: ${SPRING_MODULITH_EVENTS_EXTERNALIZATION_ENABLED:true}
       jdbc:
         schema-initialization:
           enabled: true
-      # H2 in-memory: disable restart republish (state is ephemeral)
-      republish-outstanding-events-on-restart: false
-      # Remove completed publications immediately in dev/H2 to avoid growth during long runs
-      completion-mode: DELETE
+      # PostgreSQL: enable restart republish for reliability (events survive restarts)
+      republish-outstanding-events-on-restart: true
+      # UPDATE mode keeps event history for debugging and audit purposes
+      completion-mode: UPDATE
+      # Time to live for completed events (7 days = 604800 seconds)
+      # After this period, completed events should be cleaned up via a scheduled job
+      time-to-live: ${SPRING_MODULITH_EVENTS_TIME_TO_LIVE:7d}
 
 logging:
   level:
