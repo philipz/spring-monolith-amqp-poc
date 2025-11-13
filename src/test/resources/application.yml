@@ -1,0 +1,57 @@
+# Test configuration - uses H2 in-memory database instead of PostgreSQL
+server:
+  port: 0  # Random port for tests
+
+spring:
+  application:
+    name: demo-test
+
+  # H2 in-memory database for tests
+  datasource:
+    url: jdbc:h2:mem:modulith;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # RabbitMQ settings (same as main config but with localhost defaults)
+  rabbitmq:
+    host: ${SPRING_RABBITMQ_HOST:localhost}
+    port: ${SPRING_RABBITMQ_PORT:5672}
+    username: ${SPRING_RABBITMQ_USERNAME:guest}
+    password: ${SPRING_RABBITMQ_PASSWORD:guest}
+    cache:
+      channel:
+        size: 50
+
+  modulith:
+    events:
+      externalization:
+        enabled: false  # Disable for tests unless specifically testing externalization
+      jdbc:
+        schema-initialization:
+          enabled: true
+      # H2 in-memory: disable restart republish (state is ephemeral)
+      republish-outstanding-events-on-restart: false
+      # DELETE mode for tests to keep database clean
+      completion-mode: DELETE
+
+logging:
+  level:
+    org.springframework.modulith: INFO
+    org.springframework.amqp: INFO
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  amqp:
+    new-orders:
+      bind: true
+      retry-max-attempts: 3

@@ -18,18 +18,27 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE:10}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE:2}
+      connection-timeout: ${SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT:600000}
+      max-lifetime: ${SPRING_DATASOURCE_HIKARI_MAX_LIFETIME:1800000}
 
   modulith:
     events:
       externalization:
-        enabled: false
+        enabled: ${SPRING_MODULITH_EVENTS_EXTERNALIZATION_ENABLED:true}
       jdbc:
         schema-initialization:
           enabled: true
-      # H2 in-memory: disable restart republish (state is ephemeral)
+      # PostgreSQL: enable restart republish for reliability (events survive restarts)
       republish-outstanding-events-on-restart: true
-      # Remove completed publications immediately in dev/H2 to avoid growth during long runs
+      # UPDATE mode keeps event history for debugging and audit purposes
       completion-mode: UPDATE
+      # Time to live for completed events (7 days = 604800 seconds)
+      # After this period, completed events should be cleaned up via a scheduled job
+      time-to-live: ${SPRING_MODULITH_EVENTS_TIME_TO_LIVE:7d}
 
 logging:
   level:

@@ -78,14 +78,13 @@
 			<artifactId>spring-rabbit</artifactId>
 		</dependency>
 		
-		<!-- PostgreSQL：用於Jdbc事件登錄表 -->
+		<!-- PostgreSQL：用於生產環境的 JDBC 事件登錄表 -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- H2：用於測試 -->
-		<!-- H2：簡化Jdbc事件登錄表 -->
+		<!-- H2：用於測試環境 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
